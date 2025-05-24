@@ -1,37 +1,77 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Form</title>
+  <meta charset="UTF-8" />
+  <title>音声評価フォーム</title>
 </head>
 <body>
-  <h1>Form</h1>
-  <form id="survey-form">
-    <label>Q1: <input type="text" name="name" required></label><br>
-    <label>Q2: <input type="email" name="email" required></label><br>
-    <button type="submit">Submit</button>
+  <h1>音声評価フォーム</h1>
+
+  <audio id="audioPlayer" controls>
+    <source src="audio/sample1.mp3" type="audio/mpeg" />
+    お使いのブラウザはaudioタグに対応していません。
+  </audio>
+
+  <form id="ratingForm">
+    <input type="hidden" name="participant_id" value="participant_001" />
+    <input type="hidden" name="clip_id" value="sample1" />
+
+    <label>
+      評価（1〜5）:
+      <select name="rating" required>
+        <option value="" disabled selected>選択してください</option>
+        <option value="1">1（悪い）</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5（良い）</option>
+      </select>
+    </label>
+    <br />
+
+    <label>
+      コメント（任意）:<br />
+      <textarea name="comment" rows="4" cols="40"></textarea>
+    </label>
+    <br />
+
+    <button type="submit">送信</button>
   </form>
 
-  <p id="response-msg"></p>
+  <p id="responseMessage"></p>
 
   <script>
-    const form = document.getElementById('survey-form');
-    const endpoint = 'https://script.google.com/macros/s/AKfycbz2AdF8ZKe2DuHOA7xf1Tx6_pxWn20yQAqKRcknZcKv4EHSifqZPnYpSOpj98HAgc03cA/exec';
+    const form = document.getElementById('ratingForm');
+    const responseMessage = document.getElementById('responseMessage');
+    const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz2AdF8ZKe2DuHOA7xf1Tx6_pxWn20yQAqKRcknZcKv4EHSifqZPnYpSOpj98HAgc03cA/exec';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(form).entries());
+      responseMessage.textContent = '送信中...';
 
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
 
-      const result = await res.json();
-      document.getElementById('response-msg').textContent = 
-        result.status === 'success' ? '送信しました。' : 'エラーが発生しました。';
-      form.reset();
+      try {
+        const res = await fetch(GAS_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          responseMessage.textContent = '送信が完了しました。ご協力ありがとうございます。';
+          form.reset();
+        } else {
+          responseMessage.textContent = '送信に失敗しました。時間をおいて再度お試しください。';
+        }
+      } catch (error) {
+        responseMessage.textContent = '通信エラーが発生しました。';
+      }
     });
   </script>
 </body>
