@@ -2,74 +2,21 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>音声評価フォーム</title>
+  <title>音声付きアンケート</title>
 </head>
 <body>
-  <h1>音声評価フォーム</h1>
+  <h1>アンケートにご協力ください</h1>
 
-  <audio id="audioPlayer" controls>
-    <source src="audio/sample1.mp3" type="audio/mpeg" />
-    お使いのブラウザはaudioタグに対応していません。
+  <p>以下の音声をお聞きください：</p>
+  <audio controls>
+    <source src="https://raw.githubusercontent.com/ユーザー名/リポジトリ名/main/audio/sample.mp3" type="audio/mpeg">
+    このブラウザはaudio再生に対応していません。
   </audio>
 
-  <form id="ratingForm">
-    <input type="hidden" name="participant_id" value="participant_001" />
-    <input type="hidden" name="clip_id" value="sample1" />
+  <hr>
 
-    <label>
-      評価（1〜5）:
-      <select name="rating" required>
-        <option value="" disabled selected>選択してください</option>
-        <option value="1">1（悪い）</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5（良い）</option>
-      </select>
-    </label>
-    <br />
-
-    <label>
-      コメント（任意）:<br />
-      <textarea name="comment" rows="4" cols="40"></textarea>
-    </label>
-    <br />
-
-    <button type="submit">送信</button>
-  </form>
-
-  <p id="responseMessage"></p>
-
-  <script>
-    const form = document.getElementById('ratingForm');
-    const responseMessage = document.getElementById('responseMessage');
-    const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw4BWXvm1YIcucfH-v3JpYnxG9EapXvbmGgb9eW8ZTh-zbZUHIvhhay6b1trTtwNric/exec';
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      responseMessage.textContent = '送信中...';
-
-      const formData = new FormData(form);
-      const encodedData = new URLSearchParams(formData);
-
-      try {
-        const res = await fetch(GAS_ENDPOINT, {
-          method: 'POST',
-          body: encodedData  // Content-Type は自動で application/x-www-form-urlencoded に設定される
-        });
-
-        const result = await res.json();
-
-        if (result.status === 'success') {
-          responseMessage.textContent = '送信が完了しました。ご協力ありがとうございます。';
-          form.reset();
-        } else {
-          responseMessage.textContent = '送信に失敗しました。時間をおいて再度お試しください。';
-        }
-      } catch (error) {
-        responseMessage.textContent = '通信エラーが発生しました。';
-      }
-    });
-  </script>
+  <iframe src="https://docs.google.com/forms/d/e/1KHqWXoa5dCXUKUgsgSygSBwyspZDxz-hsSJTi1NwQH4/viewform?embedded=true" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">
+    読み込んでいます…
+  </iframe>
 </body>
 </html>
